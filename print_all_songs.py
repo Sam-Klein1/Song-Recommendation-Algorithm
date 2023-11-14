@@ -13,5 +13,9 @@ def print_all_songs():
             yr = str(int(hdf5_getters.get_year(h5)))
             if yr=='0': yr='NO RELEASE DATE INFO'
             artist = hdf5_getters.get_artist_name(h5).decode("utf-8")
-            print(f"{title} by {artist}, {yr}\n")
+            tag = hdf5_getters.get_artist_mbtags(h5)
+            t = []
+            for x in tag:
+                t.append(x.decode("utf-8"))
+            if t != [] : print(f"{title} by {artist}, {yr}\nTags: {t}\n")
             h5.close()
