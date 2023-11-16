@@ -15,3 +15,4 @@ def print_all_songs():
             artist = hdf5_getters.get_artist_name(h5).decode("utf-8")
             print(f"{title} by {artist}, {yr}\n")
             h5.close()
+print_all_songs()
