@@ -37,6 +37,7 @@ for root, dirs, files in os.walk(DB_DIR):
             artist_terms_arr = [term.decode("utf-8").replace(" ", "") for term in artist_term_from_getter]
             artist_terms_as_str = " ".join(artist_terms_arr)
             artist_terms.append(artist_terms_as_str)
+            print(hdf5_getters.get_title(h5).decode("utf-8"))
             song_names.append(hdf5_getters.get_title(h5).decode("utf-8"))
 
             print("processed file.")
@@ -51,7 +52,15 @@ similarity_matrix = cosine_similarity(vectors)
 
 # Prompt user for input song from database
 input_song = str(input("\n=======================\nsong to get recommendations for: "))
-recommended_songs = recommend(input_song, similarity_matrix, artist_terms, song_names)
-print(f"Recommendations for: {input_song}" )
-for i, song in enumerate(recommended_songs):
-    print(f"{i+1}, {song}")
+print("=======================\n")
+
+while True:
+    recommended_songs = recommend(input_song, similarity_matrix, song_names)
+    print(f"Recommendations for: {input_song}" )
+    for i, song in enumerate(recommended_songs):
+        print(f"{i+1}. {song}")
+
+    # Prompt user for input song from database
+    input_song = str(input("\n=======================\nsong to get recommendations for: "))
+    print("=======================\n")
+    
