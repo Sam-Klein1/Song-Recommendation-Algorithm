@@ -21,7 +21,6 @@ def recommend(song, similarity_matrix, song_names, top_n=5):
 
     return recommended_songs
 
-
 artist_terms = []
 song_names = []
 
@@ -43,13 +42,14 @@ for root, dirs, files in os.walk(DB_DIR):
             print("processed file.")
 
 # Create vectors and calculate cosine similarity
-cv = CountVectorizer(max_features=10000, stop_words="english")
 print("creating vectors...")
+cv = CountVectorizer(max_features=10000, stop_words="english")
 vectors = cv.fit_transform(artist_terms).toarray()
+
 print("calculating similarity matrix...")
 similarity_matrix = cosine_similarity(vectors)
 
-# Example: Recommend songs for "Heard 'Em Say"
+# Prompt user for input song from database
 input_song = str(input("\n=======================\nsong to get recommendations for: "))
 recommended_songs = recommend(input_song, similarity_matrix, artist_terms, song_names)
 print(f"Recommendations for: {input_song}" )
