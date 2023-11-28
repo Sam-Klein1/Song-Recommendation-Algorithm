@@ -6,7 +6,7 @@ import glob
 
 DB_DIR = "./MillionSongSubset"
 
-def recommend(song, similarity_matrix, artist_terms, song_names, top_n=5):
+def recommend(song, similarity_matrix, song_names, top_n=5):
     # Find the index of the given song in the artist_terms list
     song_index = song_names.index(song)
 
@@ -31,6 +31,7 @@ for root, dirs, files in os.walk(DB_DIR):
     for file_path in files:
         # Open the HDF5 file
         with hdf5_getters.open_h5_file_read(file_path) as h5:
+            print("opened file.")
 
             # Extract artist terms
             artist_term_from_getter = hdf5_getters.get_artist_terms(h5)
@@ -39,11 +40,18 @@ for root, dirs, files in os.walk(DB_DIR):
             artist_terms.append(artist_terms_as_str)
             song_names.append(hdf5_getters.get_title(h5).decode("utf-8"))
 
+            print("processed file.")
+
 # Create vectors and calculate cosine similarity
 cv = CountVectorizer(max_features=10000, stop_words="english")
+print("creating vectors...")
 vectors = cv.fit_transform(artist_terms).toarray()
+print("calculating similarity matrix...")
 similarity_matrix = cosine_similarity(vectors)
 
 # Example: Recommend songs for "Heard 'Em Say"
-recommended_songs = recommend("Heard 'Em Say", similarity_matrix, artist_terms, song_names)
-print("Recommended songs:", recommended_songs)
+input_song = str(input("\n=======================\nsong to get recommendations for: "))
+recommended_songs = recommend(input_song, similarity_matrix, artist_terms, song_names)
+print(f"Recommendations for: {input_song}" )
+for i, song in enumerate(recommended_songs):
+    print(f"{i+1}, {song}")
