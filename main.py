@@ -6,7 +6,7 @@ import glob
 
 DB_DIR = "./MillionSongSubset"
 
-def recommend(song, similarity_matrix, song_names, top_n=5):
+def recommend(song, similarity_matrix, song_names, artist_terms, top_n=10):
     # Find the index of the given song in the artist_terms list
     song_index = song_names.index(song)
 
@@ -18,8 +18,10 @@ def recommend(song, similarity_matrix, song_names, top_n=5):
 
     # Exclude the input song from the recommended list and get the top N recommendations
     recommended_songs = [song_names[i] for i in sorted_indices if i != song_index][:top_n]
+    recommended_scores = [similarity_scores[i] for i in sorted_indices if i != song_index][:top_n]
+    recommended_artist_terms = [artist_terms[i] for i in sorted_indices if i != song_index][:top_n]
 
-    return recommended_songs
+    return recommended_songs, recommended_scores, recommended_artist_terms
 
 artist_terms = []
 song_names = []
@@ -37,7 +39,6 @@ for root, dirs, files in os.walk(DB_DIR):
             artist_terms_arr = [term.decode("utf-8").replace(" ", "") for term in artist_term_from_getter]
             artist_terms_as_str = " ".join(artist_terms_arr)
             artist_terms.append(artist_terms_as_str)
-            print(hdf5_getters.get_title(h5).decode("utf-8"))
             song_names.append(hdf5_getters.get_title(h5).decode("utf-8"))
 
             print("processed file.")
@@ -50,17 +51,16 @@ vectors = cv.fit_transform(artist_terms).toarray()
 print("calculating similarity matrix...")
 similarity_matrix = cosine_similarity(vectors)
 
-# Prompt user for input song from database
+# Prompt user for input song from the database
 input_song = str(input("\n=======================\nsong to get recommendations for: "))
 print("=======================\n")
 
 while True:
-    recommended_songs = recommend(input_song, similarity_matrix, song_names)
-    print(f"Recommendations for: {input_song}" )
-    for i, song in enumerate(recommended_songs):
-        print(f"{i+1}. {song}")
+    recommended_songs, recommended_scores, recommended_artist_terms = recommend(input_song, similarity_matrix, song_names, artist_terms)
+    print(f"Recommendations for: {input_song}")
+    for i, (song, score, terms) in enumerate(zip(recommended_songs, recommended_scores, recommended_artist_terms)):
+        print(f"{i+1}. {song} \n(Similarity Score: {score:.4f}) \nArtist Terms: {terms}")
 
-    # Prompt user for input song from database
+    # Prompt user for the input song from the database
     input_song = str(input("\n=======================\nsong to get recommendations for: "))
     print("=======================\n")
-    
